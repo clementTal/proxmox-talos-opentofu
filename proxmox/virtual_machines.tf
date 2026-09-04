@@ -47,17 +47,12 @@ resource "proxmox_virtual_environment_vm" "kubernetes_control_plane" {
     vlan_id = var.vlan_tag
   }
 
+  ipconfig0   = "ip=${each.key}/24,gw=${var.network_gateway}"
+
   # Cloud init setup
   initialization {
     interface    = "scsi0"
     datastore_id = var.proxmox_storage_device
-
-    ip_config {
-      ipv4 {
-        address = "${each.key}/24"
-        gateway = var.network_gateway
-      }
-    }
 
     dns {
       servers = [var.domain_name_server]
