@@ -49,7 +49,7 @@ resource "proxmox_virtual_environment_vm" "kubernetes_control_plane" {
 
   # Cloud init setup
   initialization {
-    interface    = "ide0"
+    interface    = "scsi0"
     datastore_id = var.proxmox_storage_device
 
     ip_config {
@@ -117,7 +117,7 @@ resource "proxmox_virtual_environment_vm" "kubernetes_worker" {
 
   # Cloud init setup
   initialization {
-    interface    = "ide0"
+    interface    = "scsi0"
     datastore_id = var.proxmox_storage_device
 
     ip_config {
