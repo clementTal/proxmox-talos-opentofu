@@ -81,8 +81,24 @@ resource "talos_machine" "controlplane" {
   drain_on_upgrade = false
 }
 
+resource "null_resource" "wait_for_vip" {
+  depends_on = [proxmox_virtual_environment_vm.kubernetes_control_plane]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      for i in $(seq 1 60); do
+        nc -z -w2 ${var.cluster_vip_shared_ip} 50001 && exit 0
+        sleep 5
+      done
+      echo "VIP not reachable after timeout" >&2
+      exit 1
+    EOT
+  }
+}
+
+
 resource "talos_machine" "worker" {
-  depends_on = [proxmox_virtual_environment_vm.kubernetes_worker]
+  depends_on = [proxmox_virtual_environment_vm.kubernetes_worker,null_resource.wait_for_vip]
   for_each   = var.node_data.workers
 
   node                  = each.key
