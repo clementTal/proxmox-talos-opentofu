@@ -82,7 +82,7 @@ resource "talos_machine" "controlplane" {
 }
 
 resource "null_resource" "wait_for_vip" {
-  depends_on = [proxmox_virtual_environment_vm.kubernetes_control_plane]
+  depends_on = [talos_machine.controlplane]
 
   provisioner "local-exec" {
     command = <<-EOT
