@@ -82,7 +82,7 @@ resource "talos_machine" "controlplane" {
 }
 
 resource "null_resource" "wait_for_vip" {
-  depends_on = [talos_machine.controlplane]
+  depends_on = [proxmox_virtual_environment_vm.kubernetes_control_plane,proxmox_virtual_environment_vm.kubernetes_worker,talos_machine.controlplane]
 
   provisioner "local-exec" {
     command = <<-EOT
@@ -98,7 +98,7 @@ resource "null_resource" "wait_for_vip" {
 
 
 resource "talos_machine" "worker" {
-  depends_on = [proxmox_virtual_environment_vm.kubernetes_worker,null_resource.wait_for_vip]
+  depends_on = [null_resource.wait_for_vip]
   for_each   = var.node_data.workers
 
   node                  = each.key
